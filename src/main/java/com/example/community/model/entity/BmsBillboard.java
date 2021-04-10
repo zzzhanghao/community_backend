@@ -16,6 +16,8 @@ import java.util.Date;
 @TableName("bms_billboard")
 @NoArgsConstructor
 @AllArgsConstructor
+
+//公告栏数据
 public class BmsBillboard implements Serializable {
 
     private static final long serialVersionUID = 1L;
