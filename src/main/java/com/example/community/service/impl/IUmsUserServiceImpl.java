@@ -7,6 +7,9 @@ import com.example.community.mapper.UmsUserMapper;
 import com.example.community.model.dto.RegisterDTO;
 import com.example.community.model.entity.UmsUser;
 import com.example.community.service.IUmsUserService;
+import com.example.community.jwt.JwtUtil;
+import com.example.community.model.dto.LoginDTO;
+
 import com.example.community.utils.MD5Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,6 +41,25 @@ public class IUmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> imp
         baseMapper.insert(addUser);
         return addUser;
     }
-
+    @Override
+    public UmsUser getUserByUsername(String username) {
+        return baseMapper.selectOne(new LambdaQueryWrapper<UmsUser>().eq(UmsUser::getUsername, username));
+    }
+    @Override
+    public String executeLogin(LoginDTO dto) {
+        String token = null;
+        try {
+            UmsUser user = getUserByUsername(dto.getUsername());
+            String encodePwd = MD5Utils.getPwd(dto.getPassword());
+            if(!encodePwd.equals(user.getPassword()))
+            {
+                throw new Exception("密码错误");
+            }
+            token = JwtUtil.generateToken(String.valueOf(user.getUsername()));
+        } catch (Exception e) {
+            log.warn("用户不存在or密码验证失败=======>{}", dto.getUsername());
+        }
+        return token;
+    }
 
 }
